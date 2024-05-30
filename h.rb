@@ -21,7 +21,7 @@ COMPNAV_H_REPOS_DIR = (File.expand_path ENV['COMPNAV_H_REPOS_DIR']).freeze
 H_ARG = ARGV[0].freeze
 
 # Check if H_ARG is a repo link that we should clone into h directory structure.
-if H_ARG.start_with? 'http'  
+if H_ARG.start_with? 'http'
   without_protocol = H_ARG.split('://')[1]
   host, user, repo = without_protocol.split('/')
   if host.include? 'www.'
