@@ -21,33 +21,41 @@ COMPNAV_H_REPOS_DIR = (File.expand_path ENV['COMPNAV_H_REPOS_DIR']).freeze
 H_ARG = ARGV[0].freeze
 
 # Check if H_ARG is a repo link that we should clone into h directory structure.
-if H_ARG.start_with? 'http'
-  without_protocol = H_ARG.split('://')[1]
-  host, user, repo = without_protocol.split('/')
-  if host.include? 'www.'
-    host = host.split('www.')[1]
+if H_ARG.start_with? 'http' or H_ARG.start_with? 'git@'
+  without_extension = H_ARG.split('.git')[0]
+  if H_ARG.start_with? 'http'
+    without_protocol = without_extension.split('://')[1]
+    if without_protocol.include? 'www.'
+      without_protocol = host.split('www.')[1]
+    end
+    host, user, repo = without_protocol.split('/')
+  else
+    without_protocol = without_extension.split('@')[1]
+    host, user_and_repo = without_protocol.split(':')
+    user, repo = user_and_repo.split('/')
   end
-  
+
   # Create host directory if it doesn't exist.
   host_dir = File.join(COMPNAV_H_REPOS_DIR, host)
   if !Dir.exist? host_dir
     Dir.mkdir host_dir
   end
-  
+
   # Create user directory if it doesn't exist.
   user_dir = File.join(host_dir, user)
   if !Dir.exist? user_dir
     Dir.mkdir user_dir
   end
-  
+
   # Clone repo into user directory if it doesn't exist.
   repo_dir = File.join(user_dir, repo)
   if !Dir.exist? repo_dir
     Dir.chdir(user_dir) do
-      system("git clone #{H_ARG}")
+      system("git clone git@#{host}:#{user}/#{repo}.git")
+      # system("git clone #{H_ARG}")
     end
   end
-  
+
   puts path_with_tilde repo_dir
   exit
 end
@@ -63,7 +71,7 @@ Dir.chdir(COMPNAV_H_REPOS_DIR) do
     full_dir_host = File.join(COMPNAV_H_REPOS_DIR, dir_host)
     Dir.glob('*').select { |f| File.directory? f }.each { |dir_user| Dir.chdir(dir_user) do
       full_dir_user = File.join(full_dir_host, dir_user)
-      
+
       Dir.glob('*').select { |f| File.directory? f }
         .map { |dir_repo| File.join(full_dir_user, dir_repo) }
         .filter { |full_dir_repo| full_dir_repo != PWD }
