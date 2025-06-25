@@ -51,7 +51,7 @@ if H_ARG.start_with? 'http' or H_ARG.start_with? 'git@'
   repo_dir = File.join(user_dir, repo)
   if !Dir.exist? repo_dir
     Dir.chdir(user_dir) do
-      system("git clone git@#{host}:#{user}/#{repo}.git")
+      system("git clone https://#{host}/#{user}/#{repo}.git")
       # system("git clone #{H_ARG}")
     end
   end
