@@ -52,6 +52,9 @@ if H_ARG.start_with? 'http' or H_ARG.start_with? 'git@'
   if !Dir.exist? repo_dir
     Dir.chdir(user_dir) do
       system("git clone https://#{host}/#{user}/#{repo}.git")
+      if system('command -v jj > /dev/null')
+        Dir.chdir(repo_dir) { system('jj git init --colocate') }
+      end
       # system("git clone #{H_ARG}")
     end
   end
